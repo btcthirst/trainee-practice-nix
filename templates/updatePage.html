@@ -1,0 +1,21 @@
+{{ define "update"}}
+
+{{ template "header"}}
+    <main class="container bg-light">
+        <form action="post" id="update" name="update-form">
+            <label for="title">Title of the article</label>
+            <input type="input" name="title" placeholder="type the title" id="title" class="form-control">
+            <label for="body"> The full text of the article</label>
+            <textarea name="body" id="body" cols="30" rows="20" class="form-control"></textarea>
+            <div class="form-control d-flex justify-content-between">
+                <button class="btn btn-success col-3"  type="submit">update</button>
+                <button class="btn btn-danger col-3"  type="submit">delete</button>
+            </div>
+            
+        </form>
+    </main>
+{{ template "footer"}}
+
+{{ end }}
+
+    

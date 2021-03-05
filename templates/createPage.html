@@ -1,0 +1,18 @@
+{{ define "create"}}
+
+{{ template "header"}}
+    <main class="container bg-light">
+        <form action="post" id="create" name="create-form">
+            <label for="title">Title of the article</label>
+            <input type="input" name="title" placeholder="type the title" id="title" class="form-control">
+            <label for="body"> The full text of the article</label>
+            <textarea name="body" id="body" cols="30" rows="20" class="form-control"></textarea>
+            <button class="btn btn-success form-control"  type="submit">create</button>
+        </form>
+        <p>some text below for description something</p>
+    </main>
+{{ template "footer"}}
+
+{{ end }}
+
+    

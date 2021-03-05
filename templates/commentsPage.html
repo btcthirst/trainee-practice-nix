@@ -1,0 +1,17 @@
+{{ define "comments"}}
+
+{{ template "header"}}
+    <main class="container bg-light">
+        <form action="post" id="comment" name="comment-form">
+            
+            <textarea name="article" id="article" cols="30" rows="15" class="form-control" placeholder="just for dev... the name of post and text"aria-label="readonly input example" readonly></textarea>
+            <input type="email" name="email" id="email" class="form-control" part="example@exmp.com" placeholder="example@exmp.com">
+            <textarea name="comment" id="comment" cols="30" rows="10" class="form-control"></textarea>
+            <button class="btn btn-success form-control"  type="submit">create</button>
+        </form>
+    </main>
+{{ template "footer"}}
+
+{{ end }}
+
+    

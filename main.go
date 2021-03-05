@@ -1,106 +1,63 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"html/template"
 	"net/http"
-
-	"gorm.io/gorm"
-
-	"gorm.io/driver/mysql"
 )
 
-//Articles is an exported struct
-type Articles struct {
-	UserID int    `json:"userId"`
-	ID     int    `json:"id"`
-	Title  string `json:"title"`
-	Body   string `json:"body"`
-}
-
-//Testcomments is an exported struct
-type Testcomments struct {
-	gorm.Model
-	PostID int    `json:"postId"`
-	ID     int    `json:"id"`
-	Name   string `json:"name"`
-	Email  string `json:"email"`
-	Body   string `json:"body"`
-}
-
-const (
-	host     = "127.0.0.1"
-	port     = ":3306"
-	database = "golang"
-	user     = "webmax"
-	password = "qwerty1234#WebM4X"
-)
-
-func dbConn() *gorm.DB {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, database)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("db connection faild")
-	}
-	fmt.Println("connection ok")
-	return db
-}
-
-func ins(com []Testcomments) {
-	db := dbConn()
-
-	db.Create(&com)
-
-}
-
-func getDataJSON(urla string, c string) {
-	resp, err := http.Get(urla)
-	if err != nil {
-		panic(err)
-	}
-	body, err := ioutil.ReadAll(resp.Body)
+// page for create articles
+func createPage(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./templates/createPage.html", "./templates/header.html", "./templates/footer.html")
 	if err != nil {
 		panic(err)
 	}
 
-	go unmarshJSON(body, c)
-
+	t.ExecuteTemplate(w, "create", nil)
 }
 
-func unmarshJSON(b []byte, check string) {
-	var posts []Articles
-	var comments []Testcomments
-	switch check {
-	case "posts":
-		json.Unmarshal(b, &posts)
-		for _, v := range posts {
-
-			urla := fmt.Sprintf("https://jsonplaceholder.typicode.com/comments?postId=%d", v.ID)
-
-			go getDataJSON(urla, "comments")
-
-		}
-	case "comments":
-		json.Unmarshal(b, &comments)
-
-		go ins(comments)
-
-	default:
-		fmt.Println("I don't know how to do this yet. contact the developers")
+//page for update/delete articles
+func updatePage(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./templates/updatePage.html", "./templates/header.html", "./templates/footer.html")
+	if err != nil {
+		panic(err)
 	}
+
+	t.ExecuteTemplate(w, "update", nil)
+}
+
+//page for create comments
+func commentsPage(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./templates/commentsPage.html", "./templates/header.html", "./templates/footer.html")
+	if err != nil {
+		panic(err)
+	}
+
+	t.ExecuteTemplate(w, "comments", nil)
+}
+
+//main page
+func homePage(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./templates/homePage.html", "./templates/header.html", "./templates/footer.html", "./templates/sidebar.html")
+	if err != nil {
+		panic(err)
+	}
+
+	t.ExecuteTemplate(w, "home", nil)
+}
+
+func initServ() {
+	http.HandleFunc("/", homePage)
+	http.HandleFunc("/create/", createPage)
+	http.HandleFunc("/update/", updatePage)
+	http.HandleFunc("/comments/", commentsPage)
+
+	fmt.Println(http.ListenAndServe(":7575", nil))
 
 }
 
 func main() {
-
-	uIdent := 7
-	check := "posts"
-	urla := fmt.Sprintf("https://jsonplaceholder.typicode.com/posts?userId=%d", uIdent)
-
-	go getDataJSON(urla, check)
-
-	fmt.Scan(&check)
-	fmt.Println(check)
+	initServ()
+	fmt.Println("test")
 
 }

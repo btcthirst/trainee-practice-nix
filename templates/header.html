@@ -1,0 +1,35 @@
+{{ define "header"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test rest api</title>
+
+     <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+</head>
+<body>
+    <header class="container-fluid bg-dark text-warning">
+        <section class="container d-flex justify-content-center p-2">
+            <h1>test rest api</h1>
+            
+        </section>
+
+        <section class="container">
+            <menu class="d-flex justify-content-center">
+                <nav class="nav navbar">
+                    <ul class="nav">
+                        <li class="nav-item"><a href="/" class="nav-link">home</a></li>
+                        <li class="nav-item"><a href="/create/" class="nav-link">create</a></li>
+                        <li class="nav-item"><a href="/update/" class="nav-link">update/delete</a></li>
+                        <li class="nav-item"><a href="/comments/" class="nav-link">comment</a></li>
+                        
+                    </ul>
+                </nav>
+            </menu>
+        </section>
+    </header>
+{{ end }}
