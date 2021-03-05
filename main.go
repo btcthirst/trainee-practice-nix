@@ -1,13 +1,14 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	_ "github.com/go-sql-driver/mysql"
+	"gorm.io/gorm"
+
+	"gorm.io/driver/mysql"
 )
 
 //Articles is an exported struct
@@ -18,8 +19,9 @@ type Articles struct {
 	Body   string `json:"body"`
 }
 
-//Comments is an exported struct
-type Comments struct {
+//Testcomments is an exported struct
+type Testcomments struct {
+	gorm.Model
 	PostID int    `json:"postId"`
 	ID     int    `json:"id"`
 	Name   string `json:"name"`
@@ -29,28 +31,46 @@ type Comments struct {
 
 const (
 	host     = "127.0.0.1"
+	port     = ":3306"
 	database = "golang"
 	user     = "webmax"
 	password = "qwerty1234#WebM4X"
 )
 
-func conn(urla string, c string) {
-	conn, err := http.Get(urla)
+func dbConn() *gorm.DB {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, database)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		panic("db connection faild")
 	}
-	body, err := ioutil.ReadAll(conn.Body)
-	if err != nil {
-		panic(err)
-	}
+	fmt.Println("connection ok")
+	return db
+}
 
-	go unmarshJ(body, c)
+func ins(com []Testcomments) {
+	db := dbConn()
+
+	db.Create(&com)
 
 }
 
-func unmarshJ(b []byte, check string) {
+func getDataJSON(urla string, c string) {
+	resp, err := http.Get(urla)
+	if err != nil {
+		panic(err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	go unmarshJSON(body, c)
+
+}
+
+func unmarshJSON(b []byte, check string) {
 	var posts []Articles
-	var comm []Comments
+	var comments []Testcomments
 	switch check {
 	case "posts":
 		json.Unmarshal(b, &posts)
@@ -58,37 +78,16 @@ func unmarshJ(b []byte, check string) {
 
 			urla := fmt.Sprintf("https://jsonplaceholder.typicode.com/comments?postId=%d", v.ID)
 
-			go conn(urla, "comments")
+			go getDataJSON(urla, "comments")
 
 		}
 	case "comments":
-		json.Unmarshal(b, &comm)
-		connectionString := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?allowNativePasswords=true", user, password, host, database)
+		json.Unmarshal(b, &comments)
 
-		go conDb(connectionString, comm)
+		go ins(comments)
 
 	default:
 		fmt.Println("I don't know how to do this yet. contact the developers")
-	}
-
-}
-
-func conDb(name string, comm []Comments) {
-
-	for _, vc := range comm {
-		db, err := sql.Open("mysql", name)
-		if err != nil {
-			panic(err)
-		}
-		defer db.Close()
-
-		insData := fmt.Sprintf("INSERT INTO testcomments (postid, id, name, email, body) VALUES('%d', '%d', '%s', '%s', '%s')", vc.PostID, vc.ID, vc.Name, vc.Email, vc.Body)
-
-		_, err = db.Exec(insData)
-		if err != nil {
-			panic(err)
-		}
-
 	}
 
 }
@@ -99,8 +98,9 @@ func main() {
 	check := "posts"
 	urla := fmt.Sprintf("https://jsonplaceholder.typicode.com/posts?userId=%d", uIdent)
 
-	go conn(urla, check)
+	go getDataJSON(urla, check)
 
 	fmt.Scan(&check)
 	fmt.Println(check)
+
 }
