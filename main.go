@@ -19,7 +19,7 @@ type Articles struct {
 	Body   string `json:"body"`
 }
 
-//Testcomments is an exported struct and named as db.table
+//Testcomments is an exported struct
 type Testcomments struct {
 	gorm.Model
 	PostID int    `json:"postId"`
